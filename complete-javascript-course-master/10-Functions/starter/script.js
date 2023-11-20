@@ -160,8 +160,8 @@ const greetArrow = (greeting) => (name) => console.log(`${greeting} ${name}`);
 greetArrow('Sup')('Yelena');
 */
 
+/*
 // Lesson 6 - the call and apply methods
-
 const lufthansa = {
   airline: 'Lufthansa',
   iataCode: 'LH',
@@ -264,3 +264,94 @@ const addVAT1 = addTax1(0.23);
 console.log('---- Function returning function ---- ');
 // console.log(addTax1(0.23)(250));
 console.log(addVAT1(250));
+*/
+
+/*
+// Lesson 7 - Immediately invoked function expressions (IIFE)
+// Functions that are only executed once, and it desappears when its called once
+
+const runOnce = function () {
+  console.log('This will never run again');
+};
+runOnce();
+
+// IIFE
+(function () {
+  console.log('This will never run again');
+  const isPrivate = 29; // encapsulated inside of this function scope
+})(); // () calls it immediately
+
+// console.log(isPrivate); // Error
+
+(() => console.log('This will also never run again'))();
+*/
+
+/*
+// Lesson 8 - Closures
+// Analyzing call stack
+const secureBooking = function () {
+  let passengerCount = 0;
+
+  return function () {
+    passengerCount++;
+    console.log(`${passengerCount} passengers`);
+  };
+};
+
+const booker = secureBooking();
+
+booker();
+booker();
+booker();
+
+// A function has access to the variable environment (VE) of the execution context in which it was created
+// Closure - VE attached to the function, exactly as it was at the time and place the function was created
+// Closure - is like a backpack that a function carries around wherever it goes. This backpack has all the variables that were present in the environment where the function was created
+// !! We do not have to create closues manually !! JS does it automatically
+
+console.dir(booker);
+*/
+
+// Lesson 9 - More Closure Examples
+
+let f;
+
+const g = function () {
+  const a = 23;
+
+  f = function () {
+    console.log(a * 2);
+  };
+};
+
+const h = function () {
+  const b = 777;
+  f = function () {
+    console.log(b * 2);
+  };
+};
+
+g();
+f();
+console.dir(f);
+
+// Re-assigning f function
+h();
+f();
+console.dir(f);
+
+// Example 2
+const boardPassengers = function (n, wait) {
+  const perGroup = n / 3;
+
+  // timer function
+  setTimeout(function () {
+    console.log(`We are now boarding all ${n} passengers`);
+    console.log(`There are 3 groups, each with ${perGroup} passengers`);
+  }, wait * 1000);
+
+  console.log(`Will start boarding in ${wait} seconds`);
+};
+
+const perGroup = 1000; // the variable inside of the function is prioritized, not this
+boardPassengers(180, 3);
