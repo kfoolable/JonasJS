@@ -73,14 +73,93 @@ const displayMovements = function (movements) {
       <div class="movements__type movements__type--${type}">${
       i + 1
     } ${type}</div>
-      <div class="movements__value">${mov}</div>
+      <div class="movements__value">${mov} €</div>
     </div>
     `;
     containerMovements.insertAdjacentHTML('afterbegin', html); // more on mdn docs
   });
 };
-displayMovements(account1.movements);
 // console.log(containerMovements.innerHTML);
+
+const calcDisplayBalance = function (movements) {
+  const balance = movements.reduce((acc, mov) => acc + mov, 0);
+  labelBalance.textContent = `${balance} €`;
+};
+
+const calcDisplaySummary = function (acc) {
+  const incomes = acc.movements
+    .filter((mov) => mov > 0)
+    .reduce((acc, mov) => acc + mov, 0);
+  labelSumIn.textContent = `${incomes} €`;
+
+  const out = acc.movements
+    .filter((mov) => mov < 0)
+    .reduce((acc, mov) => acc + mov, 0);
+  labelSumOut.textContent = `${Math.abs(out)} €`;
+
+  const interest = acc.movements
+    .filter((mov) => mov > 0)
+    .map((deposit) => (deposit * acc.interestRate) / 100)
+    .filter((int, i, arr) => {
+      //console.log(arr);
+      return int >= 1;
+    })
+    .reduce((acc, int) => acc + int, 0);
+  labelSumInterest.textContent = `${interest}€`;
+};
+
+const createUsernames = function (accs) {
+  // distiinction whether to use map or filter
+  accs.forEach(function (acc) {
+    acc.username = acc.owner // acc.username added a new property to the accounts array objects
+      .toLowerCase()
+      .split(' ')
+      .map((name) => name[0]) // arrow function
+      .join('');
+  });
+};
+createUsernames(accounts);
+
+// console.log(accounts);
+// const user = 'Steven Thomas Williams'; // stw
+
+// console.log(username); // ['steven', 'thomas', 'williams'] // stw (string)
+
+// Even handlers
+let currentAccount;
+
+btnLogin.addEventListener('click', function (e) {
+  // Prevents form form submitting
+  e.preventDefault();
+
+  currentAccount = accounts.find(
+    (acc) => acc.username === inputLoginUsername.value
+  );
+  console.log(currentAccount);
+
+  // optional chaining
+  // the pin property can only be read if the currentAccount exists
+  if (currentAccount?.pin === Number(inputLoginPin.value)) {
+    // Display UI and welcome message
+    labelWelcome.textContent = `Welcome back, ${
+      currentAccount.owner.split(' ')[0]
+    }`;
+    containerApp.style.opacity = 100;
+
+    // clear input fields
+    inputLoginUsername.value = inputLoginPin.value = '';
+    inputLoginPin.blur(); // loses focus on the element, meaning it removes the cursor blink
+
+    // Display movements
+    displayMovements(currentAccount.movements);
+
+    // Display balance
+    calcDisplayBalance(currentAccount.movements);
+
+    // Display summary
+    calcDisplaySummary(currentAccount);
+  }
+});
 
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
@@ -128,7 +207,6 @@ console.log(arr2);
 
 // CONCAT
 // concatenate two arrays
-
 const letters = arr.concat(arr2);
 console.log(letters);
 console.log([...arr, ...arr2]); // same as above
@@ -148,7 +226,7 @@ console.log(arr.at(0)); // 23
 console.log(arr[arr.length - 1]); // 64
 console.log(arr.slice(-1)[0]); // 64 - creates a new array
 
-console.log(arr.at(-1)); // 64
+console.log(arr.at(-1)); // 64 //easier method to take the last element
 
 // This method is mostly used to get the last value of an array. at method makes it easier
 */
@@ -168,7 +246,7 @@ for (const [i, movement] of movements.entries()) {
 
 console.log('------ forEach ------');
 movements.forEach(function (movement, index, array) {
-  // arguments are (values of the array, index, and teh array itself)
+  // arguments are (values of the array, index, and the array itself)
   if (movement > 0) {
     console.log(`Movement ${index + 1}: You deposited ${movement}`);
   } else {
@@ -217,7 +295,7 @@ currenciesSet.forEach(function (value, _, map) {
 
 // reduce
 // reduce boils ("reduces") all array elements down to one single value (eg adding all elements together)
-// no new array
+// no new array -- same array, just with one value
 
 /*
 // LESSON 6 - The map method
@@ -249,4 +327,92 @@ const movementsDescriptions = movements.map(
     )}`
 );
 console.log(movementsDescriptions);
+*/
+
+/*
+// LESSON 7 - filter method
+const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+
+const deposits = movements.filter(function (mov) {
+  return mov > 0; // boolean
+});
+console.log(movements);
+console.log(deposits); // removed the negative values
+
+// for of
+const depositsFor = [];
+for (const mov of movements) {
+  if (mov > 0) {
+    depositsFor.push(mov);
+  }
+}
+console.log(depositsFor);
+
+const withdrawals = movements.filter((mov) => mov < 0);
+console.log(withdrawals);
+*/
+
+/*
+// LESSON 8 - reduce method
+const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+console.log(movements);
+// accumulator --> snowball
+// const balance = movements.reduce(function (acc, cur, i, arr) {
+//   console.log(`Iteration number ${i}: ${acc}`);
+//   return acc + cur;
+// }, 0); // 0 is the initial value of the accumulator
+const balance = movements.reduce((acc, cur) => acc + cur);
+console.log(balance);
+
+let balance2 = 0;
+for (const mov of movements) {
+  balance2 += mov;
+}
+console.log(balance2);
+
+// Maximum value of the movements array
+const max = movements.reduce((acc, cur) => {
+  if (acc > cur) return acc;
+  else return cur;
+}, movements[0]);
+console.log(max);
+*/
+
+/*
+// LESSON 9 - Chaining Methods
+const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+
+const eurToUsd = 1.1;
+
+// PIPELINE
+const totalDepositsToUSD = movements
+  .filter((mov) => mov > 0)
+  .map((mov) => mov * eurToUsd)
+  .reduce((acc, mov) => acc + mov, 0);
+console.log(totalDepositsToUSD);
+*/
+
+/*
+// LESSON 10 - find method
+const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+// it also loops over the array, retrieves an element of the array
+// its kinda like the filter method
+// but it does not return a new array, it will just return the first element for which the condition is true
+const firstWithdrawal = movements.find((mov) => mov < 0);
+console.log(movements);
+console.log(firstWithdrawal);
+
+// console.log(accounts);
+
+// const account = accounts.find((acc) => acc.owner === 'Jessica Davis');
+// console.log(account);
+// let jessicasAccount;
+
+// for (const account of accounts) {
+//   if (account.owner === 'Jessica Davis') {
+//     jessicasAccount = account;
+//     break;
+//   }
+// }
+// console.log(jessicasAccount);
 */
