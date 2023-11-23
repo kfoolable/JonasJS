@@ -357,7 +357,7 @@ const currencies = new Map([
 currencies.forEach(function (value, key, map) {
   // first parameter is the value, second is key and the third one is the array/map
   console.log(`${key}: ${value}`);
-  // console.log(map);
+  // console.log(map); // shows the entire map
 });
 
 // SET
@@ -493,8 +493,8 @@ console.log(firstWithdrawal);
 
 // const account = accounts.find((acc) => acc.owner === 'Jessica Davis');
 // console.log(account);
-// let jessicasAccount;
 
+// let jessicasAccount;
 // for (const account of accounts) {
 //   if (account.owner === 'Jessica Davis') {
 //     jessicasAccount = account;
@@ -509,7 +509,7 @@ console.log(firstWithdrawal);
 
 // EQUALITY
 console.log(movements);
-console.log(movements.includes(-130));
+console.log(movements.includes(-130)); // true
 
 // some
 // CONDITION
@@ -560,6 +560,7 @@ console.log(overallBalance2);
 // flatMap only goes 1 level deep
 */
 
+/*
 // LESSON 13 - SORTING ARRAYS
 // Strings
 const owners = ['Jonas', 'Gillian', 'Zach', 'Adam', 'Martha'];
@@ -589,3 +590,176 @@ console.log(movements);
 // });
 movements.sort((a, b) => b - a);
 console.log(movements);
+*/
+
+/*
+// LESSON 14 - More ways of creating and filling arrays
+const arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+console.log(new Array(1, 2, 3, 4, 5, 6, 7));
+
+const x = new Array(7);
+console.log(x); // 7 empty values
+x.map(() => 5); // nothing happens here
+console.log(x);
+
+// fill method
+// x.fill(1); // fills the array, and mutates it
+// console.log(x); // 1s
+
+// x.fill(1, 3);
+// console.log(x); // starts at index 3 with 1s
+
+// kinda like slice
+x.fill(1, 3, 5); // 5 is where the index ends
+console.log(x);
+
+// non - empty arrays
+arr.fill(23, 2, 6); // mutates the array
+console.log(arr);
+
+// Array.from
+const y = Array.from({ length: 7 }, () => 1);
+console.log(y); // 7 ones
+
+const z = Array.from({ length: 7 }, (_, i) => i + 1);
+console.log(z); // 1 - 7 values
+
+const randomDice = Array.from({ length: 100 }, () =>
+  Math.floor(Math.random() * 6 + 1)
+);
+// console.log(randomDice);
+
+labelBalance.addEventListener('click', function () {
+  const movementsUI = Array.from(
+    document.querySelectorAll('.movements__value'),
+    (el) => Number(el.textContent.replace('€', ''))
+  );
+
+  console.log(movementsUI);
+
+  // alternate method, but Array.from is preferable
+  // because this method, you have to create a separate
+  // function to convert it to an array
+  const movementsUI2 = [...document.querySelectorAll('.movements__value')];
+});
+*/
+
+/*
+// Which array method to use?
+* To mutate the original array *
+- add to original:
+  - .push (end)
+  - .unshift (start)
+
+- remove from original:
+  - .pop (end)
+  - .shift (start)
+  - .splice (any)
+
+- Others:
+  - .reverse
+  - .sort
+  - .fill
+
+* A new array *
+- computed from original:
+  - .map (loop)
+
+- fitered using condition:
+  - .filter
+
+- portion of original
+  - .slice
+
+- adding original to other:
+  - .concat
+
+- flattening the original:
+  - .flat
+  - .flatMap
+
+* An array index *
+- based on value:
+  - .indexOf
+  - .findIndex // search an element based on a condition
+
+* An array element *
+- based on test condition:
+  - .find
+
+* Know if array includes
+- based on value:
+  - .includes
+
+- based on test condition:
+  - .some
+  - .every
+
+* A new string *
+- based on separator string:
+  - .join
+
+* To transform to value *
+- based on accumulator:
+  - .reduce
+
+* To loop array *
+- based on callback:
+  - .forEach
+*/
+
+// 1.
+const bacnkDepositSum = accounts
+  .flatMap((acc) => acc.movements)
+  .filter((mov) => mov > 0)
+  .reduce((sum, cur) => sum + cur, 0);
+
+console.log(bacnkDepositSum);
+
+// 2.
+// const numDeposits1000 = accounts
+//   .flatMap((acc) => acc.movements)
+//   .filter((acc) => acc >= 1000).length;
+
+const numDeposits1000 = accounts
+  .flatMap((acc) => acc.movements)
+  .reduce((count, cur) => (cur >= 1000 ? ++count : count), 0);
+
+console.log(numDeposits1000);
+
+// Prefixed operator
+let a = 10;
+console.log(++a);
+
+// 3.
+const { deposits, withdrawals } = accounts
+  .flatMap((acc) => acc.movements)
+  .reduce(
+    (sums, cur) => {
+      // cur > 0 ? (sums.deposits += cur) : (sums.withdrawals += cur);
+      sums[cur > 0 ? 'deposits' : 'withdrawals'] += cur;
+      return sums;
+    },
+    { deposits: 0, withdrawals: 0 }
+  );
+
+console.log(deposits, withdrawals);
+
+// 4.
+// this is a nice title -> This Is a Nice Title
+const convertTitleCase = function (title) {
+  const capitalize = (str) => str[0].toUpperCase() + str.slice(1);
+
+  const exceptions = ['a', 'an', 'and', 'the', 'but', 'or', 'on', 'in', 'with'];
+
+  const titleCase = title
+    .toLowerCase()
+    .split(' ')
+    .map((word) => (exceptions.includes(word) ? word : capitalize(word)))
+    .join(' ');
+  return capitalize(titleCase);
+};
+
+console.log(convertTitleCase('this is a nice title'));
+console.log(convertTitleCase('this is a LONG title but Not too long'));
+console.log(convertTitleCase('and here is another title with an EXAMPLE'));
