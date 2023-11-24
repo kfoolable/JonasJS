@@ -210,11 +210,11 @@ console.log(ages);
 const friends = ['Michael', 'Steven', 'Peter'];
 
 // Add elements
-const newLength = friends.push('Jay'); // First
+const newLength = friends.push('Jay'); // Last
 console.log(friends);
 console.log(newLength);
 
-friends.unshift('John');
+friends.unshift('John'); // First
 console.log(friends);
 
 // Remove elements

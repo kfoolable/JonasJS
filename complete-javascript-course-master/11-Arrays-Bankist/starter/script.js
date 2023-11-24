@@ -269,7 +269,7 @@ let arr = ['a', 'b', 'c', 'd', 'e'];
 // parameter takes where to start slicing
 console.log(arr.slice(2));
 console.log(arr.slice(2, 4));
-console.log(arr.slice(-2)); // from the end of the array
+console.log(arr.slice(-2)); // starts from the end of the array
 console.log(arr.slice(-1));
 console.log(arr.slice(1, -2)); // starts from b, then takes everything until -2 index from the end (d)
 console.log(arr.slice()); // creates a shallow copy of the array

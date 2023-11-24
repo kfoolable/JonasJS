@@ -502,7 +502,7 @@ console.log('----- OR ------');
 console.log(3 || 'Jonas');
 console.log('' || 'Jonas');
 console.log(true || 0);
-console.log(undefined || null); // undefined is a falsy value
+console.log(undefined || null); // undefined is a falsy value so it returns the last value
 
 console.log(undefined || 0 || '' || 'Hello' || 23 || null);
 
@@ -532,7 +532,7 @@ restaurant.orderPizza && restaurant.orderPizza('mushrooms', 'spinach');
 // 1) Destructuring
 
 // Rest pattern and rest parameters
-const arr = [1, 2, ...[3, 4]]; // SPREAD because on right side of the =
+const arr = [1, 2, ...[3, 4]]; // SPREAD because on right side of the = [equal sign]
 
 // REST syntax because on the left side of =
 const [a, b, ...others] = [1, 2, 3, 4, 5];
@@ -700,7 +700,7 @@ console.log(main, secondary);
 console.log(main, secondary);
 
 // Receive 2 return values from a function
-const [starter, mainCourse] = restaurant.order(2, 0);
+const [starter, mainCourse] = restaurant.order(2, 0); // indexes
 console.log(starter, mainCourse);
 
 // Nested destructuring
