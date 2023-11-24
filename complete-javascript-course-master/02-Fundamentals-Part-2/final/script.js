@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /*
 ///////////////////////////////////////
@@ -210,7 +210,7 @@ console.log(ages);
 const friends = ['Michael', 'Steven', 'Peter'];
 
 // Add elements
-const newLength = friends.push('Jay');
+const newLength = friends.push('Jay'); // First
 console.log(friends);
 console.log(newLength);
 
