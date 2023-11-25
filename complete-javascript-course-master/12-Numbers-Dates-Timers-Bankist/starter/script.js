@@ -21,9 +21,9 @@ const account1 = {
     '2020-01-28T09:15:04.904Z',
     '2020-04-01T10:17:24.185Z',
     '2020-05-08T14:11:59.604Z',
-    '2020-05-27T17:01:17.194Z',
-    '2020-07-11T23:36:17.929Z',
-    '2020-07-12T10:51:36.790Z',
+    '2023-11-20T17:01:17.194Z',
+    '2023-11-23T23:36:17.929Z',
+    '2023-11-26T10:51:36.790Z',
   ],
   currency: 'EUR',
   locale: 'pt-PT', // de-DE
@@ -81,20 +81,43 @@ const inputClosePin = document.querySelector('.form__input--pin');
 /////////////////////////////////////////////////
 // Functions
 
-const displayMovements = function (movements, sort = false) {
+const formatMovementDate = function (date) {
+  const calcDaysPassed = (date1, date2) =>
+    Math.round(Math.abs((date2 - date1) / (1000 * 60 * 60 * 24)));
+
+  const dayPassed = calcDaysPassed(new Date(), date);
+  console.log(dayPassed);
+
+  if (dayPassed === 0) return 'Today';
+  if (dayPassed === 1) return 'Yesterday';
+  if (dayPassed <= 7) return `${dayPassed} days ago`;
+
+  const day = `${date.getDate()}`.padStart(2, '0');
+  const month = `${date.getMonth() + 1}`.padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+};
+
+const displayMovements = function (acc, sort = false) {
   containerMovements.innerHTML = '';
 
-  const movs = sort ? movements.slice().sort((a, b) => a - b) : movements;
+  const movs = sort
+    ? acc.movements.slice().sort((a, b) => a - b)
+    : acc.movements;
 
   movs.forEach(function (mov, i) {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
+
+    const date = new Date(acc.movementsDates[i]);
+    const displayDate = formatMovementDate(date);
 
     const html = `
       <div class="movements__row">
         <div class="movements__type movements__type--${type}">${
       i + 1
     } ${type}</div>
-        <div class="movements__value">${mov}€</div>
+        <div class="movements__date">${displayDate}</div>
+        <div class="movements__value">${mov.toFixed(2)}€</div>
       </div>
     `;
 
@@ -104,19 +127,19 @@ const displayMovements = function (movements, sort = false) {
 
 const calcDisplayBalance = function (acc) {
   acc.balance = acc.movements.reduce((acc, mov) => acc + mov, 0);
-  labelBalance.textContent = `${acc.balance}€`;
+  labelBalance.textContent = `${acc.balance.toFixed(2)}€`;
 };
 
 const calcDisplaySummary = function (acc) {
   const incomes = acc.movements
     .filter(mov => mov > 0)
     .reduce((acc, mov) => acc + mov, 0);
-  labelSumIn.textContent = `${incomes}€`;
+  labelSumIn.textContent = `${incomes.toFixed(2)}€`;
 
   const out = acc.movements
     .filter(mov => mov < 0)
     .reduce((acc, mov) => acc + mov, 0);
-  labelSumOut.textContent = `${Math.abs(out)}€`;
+  labelSumOut.textContent = `${Math.abs(out).toFixed(2)}€`;
 
   const interest = acc.movements
     .filter(mov => mov > 0)
@@ -126,7 +149,7 @@ const calcDisplaySummary = function (acc) {
       return int >= 1;
     })
     .reduce((acc, int) => acc + int, 0);
-  labelSumInterest.textContent = `${interest}€`;
+  labelSumInterest.textContent = `${interest.toFixed(2)}€`;
 };
 
 const createUsernames = function (accs) {
@@ -142,7 +165,7 @@ createUsernames(accounts);
 
 const updateUI = function (acc) {
   // Display movements
-  displayMovements(acc.movements);
+  displayMovements(acc);
 
   // Display balance
   calcDisplayBalance(acc);
@@ -155,6 +178,21 @@ const updateUI = function (acc) {
 // Event handlers
 let currentAccount;
 
+// FAKE ALWAYS LOGGED IN /////////
+currentAccount = account1;
+updateUI(currentAccount);
+containerApp.style.opacity = 100;
+//////////////////////////////////
+
+// const now = new Date();
+// const day = `${now.getDate()}`.padStart(2, '0');
+// const month = `${now.getMonth() + 1}`.padStart(2, '0');
+// const year = now.getFullYear();
+// const hour = now.getHours();
+// const min = now.getMinutes();
+// labelDate.textContent = `${day}/${month}/${year}, ${hour}:${min}`;
+// // day/month/year
+
 btnLogin.addEventListener('click', function (e) {
   // Prevent form from submitting
   e.preventDefault();
@@ -164,12 +202,22 @@ btnLogin.addEventListener('click', function (e) {
   );
   console.log(currentAccount);
 
-  if (currentAccount?.pin === Number(inputLoginPin.value)) {
+  if (currentAccount?.pin === +inputLoginPin.value) {
     // Display UI and message
     labelWelcome.textContent = `Welcome back, ${
       currentAccount.owner.split(' ')[0]
     }`;
     containerApp.style.opacity = 100;
+
+    // create current date and time
+    const now = new Date();
+    const day = `${now.getDate()}`.padStart(2, '0');
+    const month = `${now.getMonth() + 1}`.padStart(2, '0');
+    const year = now.getFullYear();
+    const hour = `${now.getHours()}`.padStart(2, '0');
+    const min = `${now.getMinutes()}`.padStart(2, '0');
+    labelDate.textContent = `${day}/${month}/${year}, ${hour}:${min}`;
+    // day/month/year
 
     // Clear input fields
     inputLoginUsername.value = inputLoginPin.value = '';
@@ -182,7 +230,7 @@ btnLogin.addEventListener('click', function (e) {
 
 btnTransfer.addEventListener('click', function (e) {
   e.preventDefault();
-  const amount = Number(inputTransferAmount.value);
+  const amount = +inputTransferAmount.value;
   const receiverAcc = accounts.find(
     acc => acc.username === inputTransferTo.value
   );
@@ -198,6 +246,10 @@ btnTransfer.addEventListener('click', function (e) {
     currentAccount.movements.push(-amount);
     receiverAcc.movements.push(amount);
 
+    // Add transfer date
+    currentAccount.movementsDates.push(new Date().toISOString());
+    receiverAcc.movementsDates.push(new Date().toISOString());
+
     // Update UI
     updateUI(currentAccount);
   }
@@ -206,11 +258,15 @@ btnTransfer.addEventListener('click', function (e) {
 btnLoan.addEventListener('click', function (e) {
   e.preventDefault();
 
-  const amount = Number(inputLoanAmount.value);
+  // Math.floor is used when loaning, the cents are rounded down
+  const amount = Math.floor(inputLoanAmount.value);
 
   if (amount > 0 && currentAccount.movements.some(mov => mov >= amount * 0.1)) {
     // Add movement
     currentAccount.movements.push(amount);
+
+    // add loan date
+    currentAccount.movementsDates.push(new Date().toISOString());
 
     // Update UI
     updateUI(currentAccount);
@@ -223,7 +279,7 @@ btnClose.addEventListener('click', function (e) {
 
   if (
     inputCloseUsername.value === currentAccount.username &&
-    Number(inputClosePin.value) === currentAccount.pin
+    +inputClosePin.value === currentAccount.pin
   ) {
     const index = accounts.findIndex(
       acc => acc.username === currentAccount.username
@@ -251,3 +307,235 @@ btnSort.addEventListener('click', function (e) {
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 // LECTURES
+
+/*
+// LESSON 1 - Number methods
+console.log(23 === 23.0); // true
+
+// Base 10 - 10 to 9
+// Binary base 2 - 0 to 1
+console.log(0.1 + 0.2); // 0.30000000000000004
+
+// Conversion
+console.log(Number('23')); // string 23
+console.log(+'23'); // number 23 // better way to convert to Number
+
+// Parsing
+console.log(Number.parseInt('30px', 10)); // 30 number
+console.log(Number.parseInt('e23', 10)); // NaN
+// 10 avoids bugs
+
+console.log(Number.parseInt(' 2.5rem')); // 2
+console.log(Number.parseFloat('  2.5rem  ')); // 2.5
+
+// console.log(parseFloat(' 2.5rem ')); // 2.5
+
+console.log(Number.isNaN(20)); // false
+console.log(Number.isNaN('20')); // false
+console.log(Number.isNaN(+'20X')); // true
+console.log(Number.isNaN(23 / 0)); // false // Infinity is not a Number
+
+// best way of checking if a value is a real number
+console.log(Number.isFinite(20)); // true
+console.log(Number.isFinite('20')); // false
+console.log(Number.isFinite(+'20X')); // false
+console.log(Number.isFinite(23 / 0)); // false
+
+console.log(Number.isInteger(23));
+console.log(Number.isInteger(23.0));
+console.log(Number.isInteger(23 / 0));
+*/
+
+/*
+// LESSON 2 - Math and rounding
+
+console.log(Math.sqrt(25)); // 5
+console.log(25 ** (1 / 2)); // 5
+console.log(8 ** (1 / 3)); // 2 // cubic root
+
+console.log(Math.max(5, 18, 23, 11, 2)); // 23
+console.log(Math.max(5, 18, '23', 11, 2)); // 23 // it does type coercion
+console.log(Math.max(5, 18, '23px', 11, 2)); // NaN
+
+console.log(Math.min(5, 18, 23, 11, 2)); // 2
+
+console.log(Math.PI); // 3.141592653589793
+console.log(Math.PI * Number.parseFloat('10px') ** 2); // calculates the area of a circle // 314.1592653589793
+
+console.log(Math.random()); // random value from 0 to 1
+
+console.log(Math.trunc(Math.random() * 6)); // 0 - 5
+console.log(Math.trunc(Math.random() * 6) + 1); // 0 - 6
+
+const randomInt = (min, max) =>
+  Math.floor(Math.random() * (max - min) + 1) + min;
+// 0...1 => 0...(max - min) => min...(max - min + min) => min...max
+console.log(randomInt(10, 20)); // 10...20
+
+// Rounding integers
+console.log(Math.trunc(23.3)); // 23 // removes decimal parts
+
+console.log(Math.round(23.3)); // 23
+console.log(Math.round(23.9)); // 24
+
+console.log(Math.ceil(23.3)); // 24
+console.log(Math.round(23.9)); // 24
+
+console.log(Math.floor(23.3)); // 23
+console.log(Math.floor('23.9')); // 23
+
+console.log(Math.trunc(23.3)); // kinda similar with floor
+
+console.log(Math.trunc(-23.3)); // -23
+console.log(Math.floor(-23.3)); // -24
+// floor is a bit better than trunc because it works with any values whether positive or negative
+
+// Rounding decimals / floating point numbers
+console.log((2.7).toFixed(0)); // 3 // will always return a string
+console.log((2.7).toFixed(3)); // 2.700 // it has 3 decimal parts, but is a string
+console.log((2.345).toFixed(2)); // 2.35
+console.log(+(2.345).toFixed(2)); // 2.35 number
+
+// For more Math functions, check out the MDN docs for reference
+*/
+
+/*
+// LESSON 3 - Remainder operator
+console.log(5 % 2); // 1
+console.log(5 / 2); // 2.5
+
+console.log(8 % 3); // 2
+console.log(8 / 3); // 2.666666666665 // 8 = 2 * 3 + 2
+
+console.log(6 % 2); // 0
+console.log(6 / 2); // 3
+
+const isEven = n => n % 2 === 0;
+console.log(isEven(8)); // true
+console.log(isEven(513)); // false
+
+labelBalance.addEventListener('click', function () {
+  [...document.querySelectorAll('.movements__row')].forEach(function (row, i) {
+    // 0, 2, 4, 6 ...
+    if (i % 2 === 0) row.style.backgroundColor = 'orangered';
+    // 0, 3, 6, 9 ...
+    if (i % 3 === 0) row.style.backgroundColor = 'blue';
+  });
+});
+*/
+
+/*
+// LESSON 4 - Numeric separators
+
+// 287,460,000,000
+const diameter = 287_460_000_000;
+console.log(diameter); // 287460000000
+
+const price = 345_99;
+console.log(price); // 34599
+
+const transferFee1 = 15_00;
+const transferFee2 = 1_500;
+console.log(transferFee2.toFixed(3)); // 1500.000
+
+// const PI = 3.__1415;
+// console.log(PI); // error
+
+console.log(Number('230_000')); // NaN
+console.log(parseInt('230_000')); // 230
+*/
+
+/*
+// LESSON 5 - Working with BigInt
+// type of integers introduced in ES2020
+
+// biggest number that JS can represent
+console.log(2 ** 53 - 1); // 9007199254740991
+console.log(Number.MAX_SAFE_INTEGER); // 9007199254740991
+console.log(2 ** 53 + 1);
+// 9007199254740994; // not accurate
+
+console.log(23453453453453543534534534456456745756756); // 2.3453453453453543e+40 // not accurate
+console.log(23453453453453543534534534456456745756756n); // 23453453453453543534534534456456745756756n // n turns the number into a really huge number and displays it accurately
+console.log(BigInt(23453453453453543534534534456456745756756)); // different than the first one
+// console.log(Math.sqrt(16n)); // error
+
+// Operations
+console.log(10000n + 10000n); // 20000n
+console.log(234242342342534645674534n * 34324234234234234234234234n);
+
+const huge = 32435645654645645645645645645n;
+const num = 23;
+console.log(huge * BigInt(num)); // error w/o BigInt cannot mix big in with other types // but with BigInt, it fixes it
+
+// Exceptions
+console.log(20n > 15); // true
+console.log(20n === 20); // false
+console.log(typeof 20n); // bigInt
+console.log(20n == '20'); // true // type coercion
+
+//
+console.log(huge + ' is REALLY big!!!'); // 32435645654645645645645645645 is REALLY big!!!
+
+// Divisions
+console.log(12n / 3n); // 4n // it cuts off the decimal parts
+console.log(10 / 3); // 3.3333333333333335
+*/
+
+/*
+// LESSON 6 - Creating Dates
+// Create a date
+/*
+const now = new Date();
+console.log(now); // current date now
+
+console.log(new Date('Nov 25 2023 22:31:23')); // Sat Nov 25 2023 22:31:23 GMT+0800 (Philippine Standard Time)
+console.log(new Date('December 24, 2015')); // Thu Dec 24 2015 00:00:00 GMT+0800 (Philippine Standard Time)
+// generally not a good practice to do this
+
+console.log(new Date(account1.movementsDates[0])); // Tue Nov 19 2019 05:31:17 GMT+0800 (Philippine Standard Time)
+
+console.log(new Date(2037, 10, 19, 15, 23, 5)); // Thu Nov 19 2037 15:23:05 GMT+0800 (Philippine Standard Time) // month is 0 based
+console.log(new Date(2037, 10, 31)); // Tue Dec 01 2037 15:23:05 GMT+0800 (Philippine Standard Time) // auto corrects to Dec 01
+
+console.log(new Date(0)); // Thu Jan 01 1970 08:00:00 GMT+0800 (Philippine Standard Time)
+console.log(new Date(3 * 24 * 60 * 60 * 1000)); // Sun Jan 04 1970 08:00:00 GMT+0800 (Philippine Standard Time)
+//
+
+// Working with dates
+const future = new Date(2037, 10, 19, 15, 23);
+console.log(future);
+console.log(future.getFullYear()); // 2037
+console.log(future.getMonth()); // 10
+console.log(future.getDate()); // 19
+console.log(future.getDay()); // 4 (Thursday)
+console.log(future.getHours());
+console.log(future.getMinutes());
+console.log(future.getSeconds());
+console.log(future.toISOString()); // 2037-11-19T07:23:00.000Z
+console.log(future.getTime()); // 2142228180000 time stamp since 1970
+
+console.log(new Date(2142228180000)); // Thu Nov 19 2037 15:23:00 GMT+0800 (Philippine Standard Time) // reversed it and it gave the time
+
+console.log(Date.now()); // time stamp : 1700923381122
+
+future.setFullYear(2040);
+console.log(future); // Mon Nov 19 2040 15:23:00 GMT+0800 (Philippine Standard Time)
+*/
+
+// LESSON 7 - Adding Dates to Bankist app
+
+// LESSON 8 - Operations with Dates
+const future = new Date(2037, 10, 19, 15, 23);
+console.log(Number(future)); // 2142228180000
+console.log(+future);
+
+const calcDaysPassed = (date1, date2) =>
+  Math.abs((date2 - date1) / (1000 * 60 * 60 * 24));
+
+const days1 = calcDaysPassed(new Date(2037, 3, 14), new Date(2037, 3, 4));
+console.log(days1); // 864000000 milliseconds // after calculatiion = 10
+
+// Changes to the app, with stating dates and descriptions of transactions
+// Review logic of passing dates in displayMovements function propery to understand it better
+// in the newly made formatDate function, you learned that when a return is already passed, the code stops running lines of code after; this is in relation with the one liner if statements wiith returns.
