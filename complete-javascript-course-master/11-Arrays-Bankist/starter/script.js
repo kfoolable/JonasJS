@@ -289,7 +289,7 @@ console.log([...arr]); // same as above - shallow copy
 const arr2 = ['j', 'i', 'h', 'g', 'f'];
 
 console.log(arr2.reverse());
-console.log(arr2);
+console.log(arr2); // original array but reversed
 
 // CONCAT
 // concatenate two arrays
@@ -425,7 +425,7 @@ const deposits = movements.filter(function (mov) {
 console.log(movements);
 console.log(deposits); // removed the negative values
 
-// for of
+// for of comparison
 const depositsFor = [];
 for (const mov of movements) {
   if (mov > 0) {
@@ -509,7 +509,7 @@ console.log(firstWithdrawal);
 
 // EQUALITY
 console.log(movements);
-console.log(movements.includes(-130)); // true
+console.log(movements.includes(-130)); // true // bc if -130 is present in the array, it returns true
 
 // some
 // CONDITION
@@ -518,7 +518,7 @@ console.log(anyDeposits); // true
 
 // every
 console.log(movements.every((mov) => mov > 0)); // false
-console.log(account4.movements.every((mov) => mov > 0)); // true
+console.log(account4.movements.every((mov) => mov > 0)); // true // bc all values in this account array are positive values
 
 // separate callback function
 const deposit = (mov) => mov > 0;
@@ -604,7 +604,7 @@ console.log(x);
 
 // fill method
 // x.fill(1); // fills the array, and mutates it
-// console.log(x); // 1s
+// console.log(x); // 7 1s
 
 // x.fill(1, 3);
 // console.log(x); // starts at index 3 with 1s
@@ -619,7 +619,7 @@ console.log(arr);
 
 // Array.from
 const y = Array.from({ length: 7 }, () => 1);
-console.log(y); // 7 ones
+console.log(y); // 7 1s
 
 const z = Array.from({ length: 7 }, (_, i) => i + 1);
 console.log(z); // 1 - 7 values
@@ -708,13 +708,14 @@ labelBalance.addEventListener('click', function () {
   - .forEach
 */
 
+// Array Cardio Exercises
 // 1.
 const bacnkDepositSum = accounts
   .flatMap((acc) => acc.movements)
   .filter((mov) => mov > 0)
   .reduce((sum, cur) => sum + cur, 0);
 
-console.log(bacnkDepositSum);
+console.log(bacnkDepositSum); // 25180 // sum of all movements account
 
 // 2.
 // const numDeposits1000 = accounts
@@ -725,11 +726,11 @@ const numDeposits1000 = accounts
   .flatMap((acc) => acc.movements)
   .reduce((count, cur) => (cur >= 1000 ? ++count : count), 0);
 
-console.log(numDeposits1000);
+console.log(numDeposits1000); // 6 // count of movements more than 1000
 
 // Prefixed operator
 let a = 10;
-console.log(++a);
+console.log(++a); // 11
 
 // 3.
 const { deposits, withdrawals } = accounts
@@ -740,10 +741,10 @@ const { deposits, withdrawals } = accounts
       sums[cur > 0 ? 'deposits' : 'withdrawals'] += cur;
       return sums;
     },
-    { deposits: 0, withdrawals: 0 }
+    { deposits: 0, withdrawals: 0 } // accumulator
   );
 
-console.log(deposits, withdrawals);
+console.log(deposits, withdrawals); // 25180, -7340 // sum of deposits and withdrawals
 
 // 4.
 // this is a nice title -> This Is a Nice Title

@@ -162,10 +162,9 @@ console.log(passengerRight);
 // Check / Comparing emails
 const email = 'hello@jonas.io';
 const loginEmail = '  Hello@Jonas.IO   \n';
-
 // const lowerEmail = loginEmail.toLowerCase();
-// const trimmedEmail = lowerEmail.trim();
-// console.log(trimmedEmail);
+// const trimmedEmail = lowerEmail.trim(); // trims extra spaces
+// console.log(trimmedEmail); // hellojonas.io
 
 const normalizedEmail = loginEmail.toLowerCase().trim();
 console.log(normalizedEmail);

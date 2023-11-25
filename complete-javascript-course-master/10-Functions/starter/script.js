@@ -24,7 +24,7 @@ const createBooking = function (
 };
 
 createBooking('LH123');
-createBooking('LH123', 2, 800); // override default values
+createBooking('LH123', 2, 800); // 2 and 800 overrides params because you already set them in the argument
 createBooking('LH123', 2); // dynamically calculated price propery bc of calculation in default value set
 createBooking('LH123', 5);
 
@@ -98,7 +98,7 @@ checkIn(flight, jonas);
 //   console.log(`Original string: ${str}`);
 //   console.log(`Transformed string:  ${fn(str)}`);
 
-//   console.log(`Transformed by: ${fn.name}`);
+//   console.log(`Transformed by: ${ fn.name }`);
 // };
 
 // // callback functions
@@ -188,7 +188,7 @@ const eurowings = {
 
 const book = lufthansa.book;
 
-// book(23, 'Sarah Williams'); // typeError because the this keyword in copied method from lufthansa is only pointing to the lufthansa object, not the eurowings object itself
+// book(23, 'Sarah Williams'); // typeError because the this keyword in copied method (book) from lufthansa is only pointing to the lufthansa object, not the eurowings object itself
 
 // Call Method
 book.call(eurowings, 23, 'Sarah Williams');
@@ -216,11 +216,10 @@ console.log(swiss);
 book.call(swiss, ...flightData);
 
 // Bind method
-
 // book.call(eurowings, 23, 'Sarah Williams');
 
-const bookEW = book.bind(eurowings);
-bookEW(239, 'Steven Williams');
+const bookEW = book.bind(eurowings); // the bind method does not call the book method, it creates a new function that only points to the first object you set it to, in this example, in eurowings
+bookEW(239, 'Steven Williams'); // new function
 console.log(eurowings);
 
 const bookLH = book.bind(lufthansa);
