@@ -86,7 +86,7 @@ const formatMovementDate = function (date, locale) {
     Math.round(Math.abs((date2 - date1) / (1000 * 60 * 60 * 24)));
 
   const dayPassed = calcDaysPassed(new Date(), date);
-  //console.log(dayPassed);
+  //console.log(dayPassed); // days passed since the current day
 
   if (dayPassed === 0) return 'Today';
   if (dayPassed === 1) return 'Yesterday';
@@ -590,7 +590,7 @@ console.log(new Date(3 * 24 * 60 * 60 * 1000)); // Sun Jan 04 1970 08:00:00 GMT+
 
 // Working with dates
 const future = new Date(2037, 10, 19, 15, 23);
-console.log(future);
+console.log(future); // Thu Nov 19 2037 15:23:00 GMT+0800 (Philippine Standard Time)
 console.log(future.getFullYear()); // 2037
 console.log(future.getMonth()); // 10
 console.log(future.getDate()); // 19
@@ -621,7 +621,7 @@ const calcDaysPassed = (date1, date2) =>
   Math.abs((date2 - date1) / (1000 * 60 * 60 * 24));
 
 const days1 = calcDaysPassed(new Date(2037, 3, 14), new Date(2037, 3, 4));
-console.log(days1); // 864000000 milliseconds // after calculatiion = 10
+console.log(days1); // 864000000 milliseconds // after calculatiion = 10 days
 
 // Changes to the app, with stating dates and descriptions of transactions
 // Review logic of passing dates in displayMovements function propery to understand it better
@@ -644,7 +644,7 @@ const options = {
   // more props on mdn
 };
 
-console.log('US: ', new Intl.NumberFormat('en-US').format(num)); // US: 384,324,234.23, its now formatted with comas
+console.log('US: ', new Intl.NumberFormat('en-US').format(num)); // US: 384,324,234.23, its now formatted with comas according to US number standards
 console.log('Germany: ', new Intl.NumberFormat('de-DE').format(num)); // Germany:  384.324.234,23
 console.log('Syria: ', new Intl.NumberFormat('ar-SY').format(num)); // Syria:  ٣٨٤٬٣٢٤٬٢٣٤٫٢٣
 console.log(
