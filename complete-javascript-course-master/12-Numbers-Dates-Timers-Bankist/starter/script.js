@@ -427,9 +427,9 @@ console.log(Number.isFinite('20')); // false
 console.log(Number.isFinite(+'20X')); // false
 console.log(Number.isFinite(23 / 0)); // false
 
-console.log(Number.isInteger(23));
-console.log(Number.isInteger(23.0));
-console.log(Number.isInteger(23 / 0));
+console.log(Number.isInteger(23)); // true
+console.log(Number.isInteger(23.0)); // true 
+console.log(Number.isInteger(23 / 0)); // false
 */
 
 /*
@@ -454,9 +454,9 @@ console.log(Math.trunc(Math.random() * 6)); // 0 - 5
 console.log(Math.trunc(Math.random() * 6) + 1); // 0 - 6
 
 const randomInt = (min, max) =>
-  Math.floor(Math.random() * (max - min) + 1) + min;
+  Math.floor(Math.random() * (max - min) + 1) + min; // plus min is plus 10, because if you dont add this, the values returned will only be 1 - 10, but if you have + min (10) then the values will be from 10 - 20
 // 0...1 => 0...(max - min) => min...(max - min + min) => min...max
-console.log(randomInt(10, 20)); // 10...20
+console.log(randomInt(10, 20)); // values from 10...20
 
 // Rounding integers
 console.log(Math.trunc(23.3)); // 23 // removes decimal parts
