@@ -733,12 +733,12 @@ let a = 10;
 console.log(++a); // 11
 
 // 3.
-const { deposits, withdrawals } = accounts
+const { deposits, withdrawals } = accounts // accounts array with account objects
   .flatMap((acc) => acc.movements)
   .reduce(
     (sums, cur) => {
       // cur > 0 ? (sums.deposits += cur) : (sums.withdrawals += cur);
-      sums[cur > 0 ? 'deposits' : 'withdrawals'] += cur;
+      sums[cur > 0 ? 'deposits' : 'withdrawals'] += cur; // sums['deposits]/sums['withdrawals'] => same as sums.deposits, if you recall object destructuring lectures
       return sums;
     },
     { deposits: 0, withdrawals: 0 } // accumulator

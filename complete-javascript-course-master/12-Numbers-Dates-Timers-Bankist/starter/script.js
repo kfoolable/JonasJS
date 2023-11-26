@@ -403,13 +403,13 @@ console.log(23 === 23.0); // true
 console.log(0.1 + 0.2); // 0.30000000000000004
 
 // Conversion
-console.log(Number('23')); // string 23
+console.log(Number('23')); // Number 23
 console.log(+'23'); // number 23 // better way to convert to Number
 
 // Parsing
 console.log(Number.parseInt('30px', 10)); // 30 number
 console.log(Number.parseInt('e23', 10)); // NaN
-// 10 avoids bugs
+// 10 parameter is to avoids bugs
 
 console.log(Number.parseInt(' 2.5rem')); // 2
 console.log(Number.parseFloat('  2.5rem  ')); // 2.5
