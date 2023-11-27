@@ -640,7 +640,7 @@ const options = {
   style: 'currency', // percent ignores the units property now bc of the percent // currency needs to be defined
   unit: 'celsius', // more units in the docs
   currency: 'EUR', // currency needs to be set
-  // useGrouping: false, //false gets rid of the commas
+  // useGrouping: false, // false gets rid of the commas
   // more props on mdn
 };
 
