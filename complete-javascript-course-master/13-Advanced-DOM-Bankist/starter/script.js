@@ -97,14 +97,14 @@ btnScrollTo.addEventListener('click', function (e) {
 
 document.querySelector('.nav__links').addEventListener('click', function (e) {
   // console.log(e.target);
-  e.preventDefault();
+  e.preventDefault(); // prevents it to scroll to the id element instantly (without smooth scrolling)
 
   // Matching strategy
   // ignores clicks on elements that are not needed
   if (e.target.classList.contains('nav__link')) {
     // console.log('LINK');
     const id = e.target.getAttribute('href');
-    console.log(id);
+    console.log(id); // #section--1 id
     document.querySelector(id).scrollIntoView({
       behavior: 'smooth',
     });
@@ -120,6 +120,7 @@ tabsContainer.addEventListener('click', function (e) {
   //console.log(clicked);
 
   // guard clause
+  // if clicked outside of the container, function doesn't run
   if (!clicked) return;
 
   // Active tab
