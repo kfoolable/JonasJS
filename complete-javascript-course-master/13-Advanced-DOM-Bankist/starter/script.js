@@ -105,6 +105,33 @@ document.querySelector('.nav__links').addEventListener('click', function (e) {
   }
 });
 
+// Tabbed component
+const tabs = document.querySelectorAll('.operations__tab');
+const tabsContainer = document.querySelector('.operations__tab-container');
+const tabsContent = document.querySelectorAll('.operations__content');
+
+// tabs.forEach(t => t.addEventListener('click', () => console.log('TAB'))); // bad practice
+
+// we use event delagation
+tabsContainer.addEventListener('click', function (e) {
+  const clicked = e.target.closest('.operations__tab'); // better method than using parentElement
+  //console.log(clicked);
+
+  // guard clause
+  if (!clicked) return;
+
+  // Active tab
+  tabs.forEach(t => t.classList.remove('operations__tab--active')); // clearing all active tabs in all of them
+  tabsContent.forEach(c => c.classList.remove('operations__content--active'));
+  clicked.classList.add('operations__tab--active'); // activates css active effect
+
+  // Activate content area
+  //console.log(clicked.dataset.tab);
+  document
+    .querySelector(`.operations__content--${clicked.dataset.tab}`)
+    .classList.add('operations__content--active');
+});
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
@@ -158,7 +185,7 @@ console.log(getComputedStyle(message).color);
 console.log(getComputedStyle(message).height); // browser's calculated height // string result
 
 message.style.height =
-  Number.parseFloat(getComputedStyle(message).height, 10) + 30 + 'px'; // this doesn't work for me for some reason
+  Number.parseFloat(getComputedStyle(message).height, 10) + 30 + 'px'; // changes height of message
 
 document.documentElement.style.setProperty('--color-primary', 'orangered'); // changes html root element color property, this is how to access root properties in js
 
