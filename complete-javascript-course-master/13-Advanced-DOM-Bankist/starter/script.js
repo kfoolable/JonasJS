@@ -116,12 +116,15 @@ document.querySelector('.nav__links').addEventListener('click', function (e) {
 
 // we always use event delagation
 tabsContainer.addEventListener('click', function (e) {
+  // console.log('e.target: ', e.target);
   const clicked = e.target.closest('.operations__tab'); // better method than using parentElement
-  //console.log(clicked);
+  // the closest method is used to avoid having the span element be clicked
+  // console.log('clicked: ', clicked);
 
   // guard clause
-  // if clicked outside of the container, function doesn't run
-  if (!clicked) return;
+  // if clicked outside of the container, function doesn't run, or it ends by this point if the condition is true
+  // console.log(Boolean(!clicked));
+  if (!clicked) return; // if null, returns true -> ends the function
 
   // Active tab
   tabs.forEach(t => t.classList.remove('operations__tab--active')); // clearing all active tabs in all of them
@@ -129,7 +132,7 @@ tabsContainer.addEventListener('click', function (e) {
   clicked.classList.add('operations__tab--active'); // activates css active effect
 
   // Activate content area
-  //console.log(clicked.dataset.tab);
+  // console.log(clicked.dataset.tab); // dataset.tab is calling the data-set attribute from the clicked button element
   document
     .querySelector(`.operations__content--${clicked.dataset.tab}`)
     .classList.add('operations__content--active');
@@ -200,8 +203,8 @@ const header = document.querySelector('.header');
 const navHeight = nav.getBoundingClientRect().height;
 
 const stickyNav = function (entries) {
-  const [entry] = entries;
-  //console.log(entry);
+  const [entry] = entries; // destructures first value of the array entries
+  // console.log(entry);
 
   if (!entry.isIntersecting) nav.classList.add('sticky');
   else nav.classList.remove('sticky');
@@ -212,7 +215,6 @@ const headerObserver = new IntersectionObserver(stickyNav, {
   threshold: 0, // when 0 percent of the header is not in view
   rootMargin: `-${navHeight}px`, // box of 90px targeted outside/before of the header threshold
 });
-
 headerObserver.observe(header);
 
 // Reveal sections
