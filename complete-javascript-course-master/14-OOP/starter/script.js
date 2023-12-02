@@ -803,9 +803,10 @@ rivian
   .accelerate()
   .brake()
   .chargeBattery(50)
-  .accelerate();
-
-console.log(rivian.speedUS);
+  .accelerate()
+  .brake()
+  .accelerate()
+  .chargeBattery(10);
 
 /*
 const EV = function (make, speed, charge) {
