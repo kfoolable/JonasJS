@@ -88,7 +88,7 @@ class Cycling extends Workout {
 // APPLICATION ARCHITECTURE
 class App {
   #map;
-  #mapZoomLevel = 15;
+  #mapZoomLevel = 17;
   #mapEvent;
   #workouts = [];
 
@@ -112,8 +112,9 @@ class App {
     // The success function always takes a single parameter, which is the position
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        this._loadMap.bind(this),
+        this._loadMap.bind(this), // <- first parameter, success
         function () {
+          // second parameter, if failed
           alert('Could not get your current position');
         }
       );
