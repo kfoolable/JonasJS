@@ -104,6 +104,8 @@ class App {
     form.addEventListener('submit', this._newWorkout.bind(this));
     inputType.addEventListener('change', this._toggleElevationField);
     containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
+
+    console.log(this.#workouts);
   }
 
   _getPosition() {
@@ -339,3 +341,16 @@ class App {
 }
 
 const app = new App();
+
+// 10 Additional Features Ideas: Challenges :D
+// -> Ability to edit a workout
+// -> Ability to delete a workout
+// -> Ability to delete all workouts
+// -> Ability to sort workouts by a certain field (e.g. distance)
+// -> Re-build Running and Cycling objects coming from Local Storage
+// -> More realistic error and confirmation messages
+// Hard ones
+// -> Ability to position the map to show all workouts [very hard]
+// -> Ability to draw lines and shapes instead of just points [very hard]
+// -> Geocode location from coordinates ("Run in Faro, Portugal") [only after async JS section]
+// -> Display weather data for workout time and place [only after async JS]
