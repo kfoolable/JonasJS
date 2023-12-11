@@ -113,6 +113,10 @@ a:visited {
   font-weight: 800;
 }
 
+.remove__workout {
+  color: red;
+}
+
 .form {
   background-color: var(--color-dark--2);
   border-radius: 5px;
@@ -217,4 +221,12 @@ a:visited {
 }
 .cycling-popup .leaflet-popup-content-wrapper {
   border-left: 5px solid var(--color-brand--1);
+}
+
+.clear__workouts {
+  border: none;
+  background-color: var(--color-dark--2);
+  color: var(--color-light--2);
+  margin: 2rem 0;
+  font-size: 1.6rem;
 }

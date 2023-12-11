@@ -7,6 +7,7 @@ const inputDistance = document.querySelector('.form__input--distance');
 const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
+const clearAll = document.querySelector('.clear__workouts');
 
 class Workout {
   date = new Date();
@@ -88,9 +89,10 @@ class Cycling extends Workout {
 // APPLICATION ARCHITECTURE
 class App {
   #map;
-  #mapZoomLevel = 17;
+  #mapZoomLevel = 14;
   #mapEvent;
   #workouts = [];
+  #marker = {};
 
   constructor() {
     // Get user's position
@@ -104,8 +106,10 @@ class App {
     form.addEventListener('submit', this._newWorkout.bind(this));
     inputType.addEventListener('change', this._toggleElevationField);
     containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
+    containerWorkouts.addEventListener('click', this._removeWorkout.bind(this));
+    clearAll.addEventListener('click', this.reset.bind(this));
 
-    console.log(this.#workouts);
+    // console.log(this.#workouts);
   }
 
   _getPosition() {
@@ -232,7 +236,8 @@ class App {
   _renderWorkoutMarker(workout) {
     // Display marker when form is submitted
     // console.log(this.#mapEvent);
-    L.marker(workout.coords)
+    // console.log(workout.coords);
+    const marker = L.marker(workout.coords)
       .addTo(this.#map)
       .bindPopup(
         L.popup({
@@ -247,6 +252,11 @@ class App {
         `${workout.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'} ${workout.description}`
       )
       .openPopup();
+
+    this.#marker[workout.id] = marker;
+    // console.log(this.#marker[workout.id]);
+
+    return marker;
   }
 
   _renderWorkout(workout) {
@@ -254,6 +264,8 @@ class App {
       workout.id
     }">
     <h2 class="workout__title">${workout.description}</h2>
+    <button class="remove__workout">X</button>
+    
     <div class="workout__details">
       <span class="workout__icon">${
         workout.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'
@@ -305,7 +317,6 @@ class App {
     const workout = this.#workouts.find(
       (work) => work.id === workoutEl.dataset.id
     );
-    // console.log(workout);
 
     this.#map.setView(workout.coords, this.#mapZoomLevel, {
       animate: true,
@@ -315,7 +326,8 @@ class App {
     });
 
     // using the public interface
-    // workout.click();
+    workout.click();
+    console.log(this.#workouts[0].clicks);
   }
 
   _setLocalStorage() {
@@ -324,15 +336,59 @@ class App {
 
   _getLocalStorage() {
     const data = JSON.parse(localStorage.getItem('workouts'));
-    // console.log(data);
+    // console.log('data', data);
 
     if (!data) return;
 
-    this.#workouts = data;
+    this.#workouts = data.map((work) => {
+      let obj;
+      if (work.type === 'running') obj = new Running();
+      if (work.type === 'cycling') obj = new Cycling();
+
+      Object.assign(obj, work);
+      return obj;
+    });
+
+    // this.#workouts = data;
+    // console.log(this.#workouts);
 
     this.#workouts.forEach((work) => {
       this._renderWorkout(work);
     });
+  }
+
+  _removeWorkout(e) {
+    const clickedButton = e.target;
+    if (!clickedButton.classList.contains('remove__workout')) return;
+
+    const workoutEl = clickedButton.closest('.workout');
+    if (!workoutEl) return;
+
+    const workoutId = workoutEl.dataset.id;
+    const storedWorkouts = JSON.parse(localStorage.getItem('workouts')) || [];
+    const indexToRemove = storedWorkouts.findIndex(
+      (obj) => obj.id === workoutId
+    );
+
+    if (indexToRemove !== -1) {
+      // Get the workout's associated marker from the map using its ID
+      const marker = this.#marker[workoutId];
+      // console.log(marker);
+
+      if (marker) {
+        this.#map.removeLayer(marker); // Remove the marker from the map
+        delete this.#marker[workoutId]; // Remove the reference to the marker
+      }
+
+      // Remove the workout from the DOM
+      workoutEl.remove();
+
+      // Remove the workout from the storedWorkouts array
+      storedWorkouts.splice(indexToRemove, 1);
+
+      // Update localStorage
+      localStorage.setItem('workouts', JSON.stringify(storedWorkouts));
+    }
   }
 
   reset() {
@@ -345,10 +401,10 @@ const app = new App();
 
 // 10 Additional Features Ideas: Challenges :D
 // -> Ability to edit a workout
-// -> Ability to delete a workout
-// -> Ability to delete all workouts
+// -> Ability to delete a workout - check
+// -> Ability to delete all workouts - check
 // -> Ability to sort workouts by a certain field (e.g. distance)
-// -> Re-build Running and Cycling objects coming from Local Storage
+// -> Re-build Running and Cycling objects coming from Local Storage - check
 // -> More realistic error and confirmation messages
 // Hard ones
 // -> Ability to position the map to show all workouts [very hard]
