@@ -88,6 +88,31 @@ a:visited {
   font-size: 1.7rem;
   font-weight: 600;
   grid-column: 1 / -1;
+  position: relative;
+}
+
+.options {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-light-1);
+  font-size: 1.5rem;
+  font-weight: bolder;
+}
+
+.options-modal {
+  position: absolute;
+  width: 100px;
+  right: 0;
+  top: 0;
+  padding: 10px;
+  background-color: var(--color-dark--2);
+  box-shadow: 0 4px 8px 0 rgba(255, 255, 255, 0.3);
+  font-size: 1.3rem;
+  z-index: 9999;
 }
 
 .workout__details {

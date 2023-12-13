@@ -263,8 +263,16 @@ class App {
     let html = `<li class="workout workout--${workout.type}" data-id="${
       workout.id
     }">
-    <h2 class="workout__title">${workout.description}</h2>
-    <button class="remove__workout">X</button>
+    <h2 class="workout__title">${
+      workout.description
+    }<button class="options">...</button>
+    <div class="options-modal running hidden">
+      <div class="modal-content">
+          <p>Edit</p>
+          <p>Delete</p>
+      </div>
+    </h2>
+    <!-- <button class="remove__workout">X</button> -->
     
     <div class="workout__details">
       <span class="workout__icon">${
