@@ -107,6 +107,10 @@ class App {
     inputType.addEventListener('change', this._toggleElevationField);
     containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
     containerWorkouts.addEventListener('click', this._removeWorkout.bind(this));
+    containerWorkouts.addEventListener(
+      'click',
+      this._openEditWorkout.bind(this)
+    );
     clearAll.addEventListener('click', this.reset.bind(this));
 
     // console.log(this.#workouts);
@@ -152,6 +156,7 @@ class App {
 
   _showForm(mapE) {
     this.#mapEvent = mapE;
+
     form.classList.remove('hidden');
     inputDistance.focus();
   }
@@ -338,6 +343,41 @@ class App {
         optionsModal.classList.add('hidden');
       }
     });
+  }
+
+  _openEditWorkout(e) {
+    const clicked = e.target;
+    if (!clicked.classList.contains('edit-button')) return;
+
+    const workoutElement = clicked.closest('.workout');
+    if (!workoutElement) return;
+
+    const workoutId = workoutElement.dataset.id;
+    const workoutToEdit = this.#workouts.find(
+      (workout) => workout.id === workoutId
+    );
+
+    if (!workoutToEdit) return;
+
+    form.classList.remove('hidden');
+
+    inputType.value = workoutToEdit.type;
+    inputDistance.value = workoutToEdit.distance;
+    inputDuration.value = workoutToEdit.duration;
+
+    if (workoutToEdit.type === 'running') {
+      inputCadence.value = workoutToEdit.cadence;
+      inputElevation.closest('.form__row').classList.add('form__row--hidden');
+      inputCadence.closest('.form__row').classList.remove('form__row--hidden');
+    }
+
+    if (workoutToEdit.type === 'cycling') {
+      inputElevation.value = workoutToEdit.elevGain;
+      inputCadence.closest('.form__row').classList.add('form__row--hidden');
+      inputElevation
+        .closest('.form__row')
+        .classList.remove('form__row--hidden');
+    }
   }
 
   _moveToPopup(e) {
