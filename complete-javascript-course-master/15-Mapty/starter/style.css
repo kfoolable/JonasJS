@@ -115,6 +115,10 @@ a:visited {
   z-index: 9999;
 }
 
+.options-modal.hidden {
+  display: none;
+}
+
 .workout__details {
   display: flex;
   align-items: baseline;

@@ -266,11 +266,10 @@ class App {
     <h2 class="workout__title">${
       workout.description
     }<button class="options">...</button>
-    <div class="options-modal running hidden">
-      <div class="modal-content">
-          <p>Edit</p>
-          <p>Delete</p>
-      </div>
+    <div class="options-modal hidden">
+          <p class="edit-button">Edit</p>
+          <p class="delete-button">Delete</p>
+    </div>
     </h2>
     <!-- <button class="remove__workout">X</button> -->
     
@@ -314,6 +313,31 @@ class App {
   </li>`;
 
     form.insertAdjacentHTML('afterend', html);
+
+    // Use querySelector on the newly created workout element
+    const workoutElement = document.querySelector(`[data-id="${workout.id}"]`);
+    const optionsBtn = workoutElement.querySelector('.options');
+    const optionsModal = workoutElement.querySelector('.options-modal');
+
+    optionsBtn.addEventListener('click', () => {
+      // Close the currently open modal (if any)
+      const openModal = document.querySelector('.options-modal:not(.hidden)');
+      if (openModal && openModal !== optionsModal) {
+        openModal.classList.add('hidden');
+      }
+      optionsModal.classList.toggle('hidden');
+    });
+
+    // Close the modal if clicking outside or on non-action elements inside
+    document.addEventListener('click', (event) => {
+      if (
+        !optionsModal.contains(event.target) &&
+        !event.target.classList.contains('options') &&
+        !event.target.classList.contains('options-modal')
+      ) {
+        optionsModal.classList.add('hidden');
+      }
+    });
   }
 
   _moveToPopup(e) {
@@ -335,7 +359,7 @@ class App {
 
     // using the public interface
     workout.click();
-    console.log(this.#workouts[0].clicks);
+    // console.log(this.#workouts[0].clicks);
   }
 
   _setLocalStorage() {
@@ -367,7 +391,7 @@ class App {
 
   _removeWorkout(e) {
     const clickedButton = e.target;
-    if (!clickedButton.classList.contains('remove__workout')) return;
+    if (!clickedButton.classList.contains('delete-button')) return;
 
     const workoutEl = clickedButton.closest('.workout');
     if (!workoutEl) return;
