@@ -91,6 +91,7 @@ class App {
   #map;
   #mapZoomLevel = 14;
   #mapEvent;
+  #mapEditEvent;
   #workouts = [];
   #marker = {};
 
@@ -184,12 +185,14 @@ class App {
     const allPositive = (...inputs) => inputs.every((inp) => inp > 0);
 
     e.preventDefault(); // the page refreshes automatically with forms so we prevent that
+    // console.log('newWorkout', e);
 
     // Get data from form
     const type = inputType.value;
     const distance = +inputDistance.value;
     const duration = +inputDuration.value;
     const { lat, lng } = this.#mapEvent.latlng;
+    console.log(this.#mapEvent);
     let workout;
 
     // If it's workout running, create running object
@@ -356,6 +359,7 @@ class App {
     const workoutToEdit = this.#workouts.find(
       (workout) => workout.id === workoutId
     );
+    // console.log(workoutToEdit);
 
     if (!workoutToEdit) return;
 
