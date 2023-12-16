@@ -112,6 +112,10 @@ class App {
       'click',
       this._openEditWorkout.bind(this)
     );
+    containerWorkouts.addEventListener(
+      'click',
+      this._openOptionsModal.bind(this)
+    );
     clearAll.addEventListener('click', this.reset.bind(this));
 
     // console.log(this.#workouts);
@@ -321,22 +325,25 @@ class App {
   </li>`;
 
     form.insertAdjacentHTML('afterend', html);
+  }
 
-    // Use querySelector on the newly created workout element
-    const workoutElement = document.querySelector(`[data-id="${workout.id}"]`);
-    const optionsBtn = workoutElement.querySelector('.options');
-    const optionsModal = workoutElement.querySelector('.options-modal');
+  _openOptionsModal(e) {
+    const clicked = e.target;
+    if (!clicked.classList.contains('options')) return;
 
-    optionsBtn.addEventListener('click', () => {
-      // Close the currently open modal (if any)
-      const openModal = document.querySelector('.options-modal:not(.hidden)');
-      if (openModal && openModal !== optionsModal) {
-        openModal.classList.add('hidden');
-      }
-      optionsModal.classList.toggle('hidden');
-    });
+    const workoutEl = clicked.closest('.workout');
+    if (!workoutEl) return;
 
-    // Close the modal if clicking outside or on non-action elements inside
+    const optionsModal = workoutEl.querySelector('.options-modal');
+    const workoutId = workoutEl.dataset.id;
+
+    const openModal = document.querySelector(`[data-id="${workoutId}"]`);
+    if (openModal && openModal === optionsModal) {
+      openModal.classList.add('hidden');
+    }
+    optionsModal.classList.toggle('hidden');
+
+    // closes modal if clicked outside of it
     document.addEventListener('click', (event) => {
       if (
         !optionsModal.contains(event.target) &&
@@ -382,6 +389,13 @@ class App {
         .closest('.form__row')
         .classList.remove('form__row--hidden');
     }
+
+    // close form if clicked outside of it
+    // document.addEventListener('click', (event) => {
+    //   if (!form.contains(event.target)) {
+    //     form.classList.add('hidden');
+    //   }
+    // });
   }
 
   _moveToPopup(e) {
