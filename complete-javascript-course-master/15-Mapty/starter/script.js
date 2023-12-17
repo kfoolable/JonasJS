@@ -91,9 +91,9 @@ class App {
   #map;
   #mapZoomLevel = 14;
   #mapEvent;
-  #mapEditEvent;
   #workouts = [];
   #marker = {};
+  #workoutToEdit;
 
   constructor() {
     // Get user's position
@@ -104,7 +104,8 @@ class App {
     this._getLocalStorage();
 
     // attach event handlers
-    form.addEventListener('submit', this._newWorkout.bind(this));
+    // form.addEventListener('submit', this._newWorkout.bind(this));
+    form.addEventListener('submit', this._newOrUpdateWorkout.bind(this));
     inputType.addEventListener('change', this._toggleElevationField);
     containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
     containerWorkouts.addEventListener('click', this._removeWorkout.bind(this));
@@ -196,7 +197,7 @@ class App {
     const distance = +inputDistance.value;
     const duration = +inputDuration.value;
     const { lat, lng } = this.#mapEvent.latlng;
-    console.log(this.#mapEvent);
+    // console.log(this.#mapEvent);
     let workout;
 
     // If it's workout running, create running object
@@ -366,8 +367,8 @@ class App {
     const workoutToEdit = this.#workouts.find(
       (workout) => workout.id === workoutId
     );
+    this.#workoutToEdit = workoutToEdit;
     // console.log(workoutToEdit);
-
     if (!workoutToEdit) return;
 
     form.classList.remove('hidden');
@@ -390,12 +391,42 @@ class App {
         .classList.remove('form__row--hidden');
     }
 
-    // close form if clicked outside of it
-    // document.addEventListener('click', (event) => {
-    //   if (!form.contains(event.target)) {
-    //     form.classList.add('hidden');
-    //   }
-    // });
+    form.dataset.mode = 'edit';
+    // console.log(form.dataset.mode);
+
+    // Scroll to the top of the page
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  }
+
+  _updateWorkout(workout) {
+    console.log(workout);
+
+    workout.type = inputType.value;
+    workout.distance = +inputDistance.value;
+    workout.duration = +inputDuration.value;
+    workout.cadence = +inputCadence.value;
+    workout.elevGain = +inputElevation.value;
+
+    this._hideForm();
+    this._setLocalStorage();
+    location.reload();
+  }
+
+  _newOrUpdateWorkout(e) {
+    e.preventDefault();
+
+    const mode = e.target.dataset.mode;
+
+    if (mode === 'new') {
+      console.log('this is a new workout');
+      this._newWorkout(e);
+    } else {
+      console.log('this is an update workout');
+      this._updateWorkout(this.#workoutToEdit);
+    }
   }
 
   _moveToPopup(e) {
@@ -407,6 +438,7 @@ class App {
     const workout = this.#workouts.find(
       (work) => work.id === workoutEl.dataset.id
     );
+    // console.log(workout);
 
     this.#map.setView(workout.coords, this.#mapZoomLevel, {
       animate: true,
@@ -455,10 +487,11 @@ class App {
     if (!workoutEl) return;
 
     const workoutId = workoutEl.dataset.id;
-    const storedWorkouts = JSON.parse(localStorage.getItem('workouts')) || [];
+    const storedWorkouts = this.#workouts || [];
     const indexToRemove = storedWorkouts.findIndex(
       (obj) => obj.id === workoutId
     );
+    // console.log(indexToRemove);
 
     if (indexToRemove !== -1) {
       // Get the workout's associated marker from the map using its ID
@@ -477,7 +510,8 @@ class App {
       storedWorkouts.splice(indexToRemove, 1);
 
       // Update localStorage
-      localStorage.setItem('workouts', JSON.stringify(storedWorkouts));
+      this.#workouts = storedWorkouts;
+      this._setLocalStorage();
     }
   }
 
