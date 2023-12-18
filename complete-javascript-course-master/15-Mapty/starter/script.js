@@ -107,19 +107,28 @@ class App {
     // form.addEventListener('submit', this._newWorkout.bind(this));
     form.addEventListener('submit', this._newOrUpdateWorkout.bind(this));
     inputType.addEventListener('change', this._toggleElevationField);
-    containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
-    containerWorkouts.addEventListener('click', this._removeWorkout.bind(this));
     containerWorkouts.addEventListener(
       'click',
-      this._openEditWorkout.bind(this)
-    );
-    containerWorkouts.addEventListener(
-      'click',
-      this._openOptionsModal.bind(this)
+      this._handleContainer.bind(this)
     );
     clearAll.addEventListener('click', this.reset.bind(this));
 
     // console.log(this.#workouts);
+  }
+
+  _handleContainer(e) {
+    const clicked = e.target;
+    this._moveToPopup(e);
+
+    if (!clicked.classList.contains('.options')) {
+      this._openOptionsModal(e);
+    }
+    if (!clicked.classList.contains('.edit-button')) {
+      this._openEditWorkout(e);
+    }
+    if (!clicked.classList.contains('.delete-button')) {
+      this._removeWorkout(e);
+    }
   }
 
   _getPosition() {
@@ -368,7 +377,6 @@ class App {
       (workout) => workout.id === workoutId
     );
     this.#workoutToEdit = workoutToEdit;
-    console.log(this.#workoutToEdit);
     if (!workoutToEdit) return;
 
     form.classList.remove('hidden');
@@ -404,6 +412,11 @@ class App {
   }
 
   _updateWorkout(workout) {
+    // Validate inputs
+    const validInputs = (...inputs) =>
+      inputs.every((inp) => Number.isFinite(inp));
+    const allPositives = (...inputs) => inputs.every((inp) => inp > 0);
+
     // Get the updated values from the form
     const updatedType = inputType.value;
     const updatedDistance = +inputDistance.value;
@@ -414,13 +427,27 @@ class App {
     // Create a new workout based on the updated type
     let updatedWorkout;
     if (updatedType === 'running') {
+      if (
+        !validInputs(updatedDistance, updatedDuration, updatedCadence) ||
+        !allPositives(updatedDistance, updatedDuration, updatedCadence)
+      )
+        return alert('Inputs have to be positive numbers!');
+
       updatedWorkout = new Running(
         workout.coords,
         updatedDistance,
         updatedDuration,
         updatedCadence
       );
-    } else if (updatedType === 'cycling') {
+    }
+
+    if (updatedType === 'cycling') {
+      if (
+        !validInputs(updatedDistance, updatedDuration, updatedElevGain) ||
+        !allPositives(updatedDistance, updatedDuration)
+      )
+        return alert('Inputs have to be positive numbers!');
+
       updatedWorkout = new Cycling(
         workout.coords,
         updatedDistance,
@@ -446,12 +473,10 @@ class App {
     const mode = e.target.dataset.mode;
 
     if (mode === 'new') {
-      console.log('this is a new workout');
       this._newWorkout(e);
     }
 
     if (mode === 'edit') {
-      console.log('this is an update workout');
       const workout = this.#workoutToEdit;
       this._updateWorkout(workout);
     }
