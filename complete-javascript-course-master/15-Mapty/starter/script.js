@@ -380,8 +380,7 @@ class App {
     if (!workoutToEdit) return;
 
     form.classList.remove('hidden');
-    const modal = e.target.closest('.options-modal');
-    modal.classList.add('hidden');
+    modal.classList.toggle('hidden');
 
     inputType.value = workoutToEdit.type;
     inputDistance.value = workoutToEdit.distance;
