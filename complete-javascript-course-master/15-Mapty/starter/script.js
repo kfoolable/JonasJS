@@ -368,10 +368,12 @@ class App {
       (workout) => workout.id === workoutId
     );
     this.#workoutToEdit = workoutToEdit;
-    // console.log(workoutToEdit);
+    console.log(this.#workoutToEdit);
     if (!workoutToEdit) return;
 
     form.classList.remove('hidden');
+    const modal = e.target.closest('.options-modal');
+    modal.classList.add('hidden');
 
     inputType.value = workoutToEdit.type;
     inputDistance.value = workoutToEdit.distance;
@@ -395,24 +397,47 @@ class App {
     // console.log(form.dataset.mode);
 
     // Scroll to the top of the page
-    window.scrollTo({
-      top: 0,
+    form.scrollIntoView({
       behavior: 'smooth',
+      block: 'start',
     });
   }
 
   _updateWorkout(workout) {
-    console.log(workout);
+    // Get the updated values from the form
+    const updatedType = inputType.value;
+    const updatedDistance = +inputDistance.value;
+    const updatedDuration = +inputDuration.value;
+    const updatedCadence = +inputCadence.value;
+    const updatedElevGain = +inputElevation.value;
 
-    workout.type = inputType.value;
-    workout.distance = +inputDistance.value;
-    workout.duration = +inputDuration.value;
-    workout.cadence = +inputCadence.value;
-    workout.elevGain = +inputElevation.value;
+    // Create a new workout based on the updated type
+    let updatedWorkout;
+    if (updatedType === 'running') {
+      updatedWorkout = new Running(
+        workout.coords,
+        updatedDistance,
+        updatedDuration,
+        updatedCadence
+      );
+    } else if (updatedType === 'cycling') {
+      updatedWorkout = new Cycling(
+        workout.coords,
+        updatedDistance,
+        updatedDuration,
+        updatedElevGain
+      );
+    }
 
-    this._hideForm();
-    this._setLocalStorage();
-    location.reload();
+    // Replace the workout in the array with the updated workout
+    const workoutIndex = this.#workouts.findIndex((w) => w.id === workout.id);
+    if (workoutIndex !== -1) {
+      this.#workouts[workoutIndex] = updatedWorkout;
+    }
+
+    this._hideForm(); // Hide the form
+    this._setLocalStorage(); // Save updated workouts to local storage
+    location.reload(); // Refresh the page (you might want to update this logic)
   }
 
   _newOrUpdateWorkout(e) {
@@ -423,9 +448,12 @@ class App {
     if (mode === 'new') {
       console.log('this is a new workout');
       this._newWorkout(e);
-    } else {
+    }
+
+    if (mode === 'edit') {
       console.log('this is an update workout');
-      this._updateWorkout(this.#workoutToEdit);
+      const workout = this.#workoutToEdit;
+      this._updateWorkout(workout);
     }
   }
 
