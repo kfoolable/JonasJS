@@ -119,6 +119,14 @@ a:visited {
   display: none;
 }
 
+.options-modal p {
+  color: var(--color-light--1);
+}
+
+.options-modal p:hover {
+  color: white;
+}
+
 .workout__details {
   display: flex;
   align-items: baseline;
