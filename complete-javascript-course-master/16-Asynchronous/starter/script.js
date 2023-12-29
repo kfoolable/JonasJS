@@ -33,6 +33,11 @@
 const btn = document.querySelector('.btn-country');
 const countriesContainer = document.querySelector('.countries');
 
+const renderErr = function (msg) {
+  countriesContainer.insertAdjacentText('beforeend', msg);
+  // countriesContainer.style.opacity = 1;
+};
+
 ///////////////////////////////////////
 
 // const getCountryData = function (country) {
@@ -71,7 +76,7 @@ const countriesContainer = document.querySelector('.countries');
 // getCountryData('germany');
 
 // Lecture 3 - How the Web Works: Requests and Responses
-// Better to rewatch video
+// Better to rewatch video if you're really interested
 
 // Lecture 4 - Welcome to callback hell
 const renderCountry = function (data, className = '') {
@@ -90,7 +95,7 @@ const renderCountry = function (data, className = '') {
       </article>
   `;
   countriesContainer.insertAdjacentHTML('beforeend', html);
-  countriesContainer.style.opacity = 1;
+  // countriesContainer.style.opacity = 1;
 };
 
 const getCountryAndNeighbour = function (country) {
@@ -155,6 +160,7 @@ const getCountryAndNeighbour = function (country) {
 // - We no longer need to rely on events and callbacks passed into asynchronous functions to handle asynchronous results;
 // - Instead of nesting callbacks, we can chain promises for a sequence of asynchronous operations: escaping callback hell (woohoo)
 
+// Old-school way
 // const request = new XMLHttpRequest();
 // request.open(
 //   'GET',
@@ -162,6 +168,7 @@ const getCountryAndNeighbour = function (country) {
 // );
 // request.send();
 
+// New style way
 // const request = fetch(
 //   'https://countries-api-836d.onrender.com/countries/name/portugal'
 // );
@@ -171,7 +178,7 @@ const getCountryAndNeighbour = function (country) {
 //   fetch(`https://countries-api-836d.onrender.com/countries/name/${country}`)
 //     .then(function (response) {
 //       console.log(response);
-//       return response.json(); // <- is a method that is  available to every response object coming from the fetch function
+//       return response.json(); // <- is a method that is  available to every response object coming from the fetch method
 //     })
 //     .then(function (data) {
 //       console.log(data);
@@ -180,24 +187,41 @@ const getCountryAndNeighbour = function (country) {
 // };
 
 // Lecture 6 - Chaining Promises
+
 const getCountryData = function (country) {
   // Country 1
   fetch(`https://countries-api-836d.onrender.com/countries/name/${country}`)
-    .then((response) => response.json())
+    .then(
+      (response) => response.json()
+      // (err) => alert(err) // handling errors
+    ) // reads the ReadableStream object in the body property of the fetch data
     .then((data) => {
       renderCountry(data[0]);
       const neighbour = data[0].borders?.[0];
+      // console.log(data);
 
       if (!neighbour) return;
 
+      // return 23;
       // Country 2
       return fetch(
         `https://countries-api-836d.onrender.com/countries/alpha/${neighbour}`
       );
     })
     .then((response) => response.json())
-    .then((data) => renderCountry(data, 'neighbour'));
+    .then((data) => renderCountry(data, 'neighbour'))
+    .catch((err) => {
+      console.error(err); // better way of handling errors in all of the chains
+      renderErr(`Something went wrong: ${err.message}. Try again!`);
+    })
+    .finally(() => {
+      countriesContainer.style.opacity = 1;
+    }); // finally method is a method that happens no matter what in promises
 };
 
-// getCountryData('portugal');
-getCountryData('germany');
+btn.addEventListener('click', function () {
+  // getCountryData('portugal');
+  getCountryData('portugal');
+});
+
+// Lesson 7 - Handling Rejected Promises - code changes above, see notes for reference
