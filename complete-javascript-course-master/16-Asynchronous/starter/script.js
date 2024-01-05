@@ -176,9 +176,9 @@ const getCountryAndNeighbour = function (country) {
 
 // const getCountryData = function (country) {
 //   fetch(`https://countries-api-836d.onrender.com/countries/name/${country}`)
-//     .then(function (response) {
+//     .then(function (response) { // <- then method is called once a promise is resolved <- how a fulfilled promise is handled
 //       console.log(response);
-//       return response.json(); // <- is a method that is  available to every response object coming from the fetch method
+//       return response.json(); // <- then is a method that is  available to every response object coming from the fetch method
 //     })
 //     .then(function (data) {
 //       console.log(data);
@@ -188,40 +188,94 @@ const getCountryAndNeighbour = function (country) {
 
 // Lecture 6 - Chaining Promises
 
+const getJSON = function (url, errorMsg = 'Somethingg went wrong') {
+  return fetch(url).then((response) => {
+    if (!response.ok) throw new Error(`${errorMsg}: ${response.status}`);
+
+    return response.json();
+  });
+};
+
 const getCountryData = function (country) {
   // Country 1
-  fetch(`https://countries-api-836d.onrender.com/countries/name/${country}`)
-    .then(
-      (response) => response.json()
-      // (err) => alert(err) // handling errors
-    ) // reads the ReadableStream object in the body property of the fetch data
+  getJSON(
+    `https://countries-api-836d.onrender.com/countries/name/${country}`,
+    'Country not found'
+  )
     .then((data) => {
       renderCountry(data[0]);
       const neighbour = data[0].borders?.[0];
+      // const neighbour = 'dasfsdadf';
       // console.log(data);
 
-      if (!neighbour) return;
+      if (!neighbour) throw new Error(`No neighbour found!`);
 
-      // return 23;
       // Country 2
-      return fetch(
-        `https://countries-api-836d.onrender.com/countries/alpha/${neighbour}`
+      return getJSON(
+        `https://countries-api-836d.onrender.com/countries/alpha/${neighbour}`,
+        'Country not found'
       );
     })
-    .then((response) => response.json())
     .then((data) => renderCountry(data, 'neighbour'))
     .catch((err) => {
-      console.error(err); // better way of handling errors in all of the chains
+      console.error(err);
       renderErr(`Something went wrong: ${err.message}. Try again!`);
     })
     .finally(() => {
       countriesContainer.style.opacity = 1;
-    }); // finally method is a method that happens no matter what in promises
+    });
 };
 
 btn.addEventListener('click', function () {
   // getCountryData('portugal');
-  getCountryData('portugal');
+  getCountryData('australia');
 });
 
-// Lesson 7 - Handling Rejected Promises - code changes above, see notes for reference
+// const getCountryData = function (country) {
+//   // Country 1
+//   fetch(`https://countries-api-836d.onrender.com/countries/name/${country}`)
+//     .then((response) => {
+//       console.log(response);
+
+//       if (!response.ok)
+//         throw new Error(`Country not found: ${response.status}`);
+
+//       return response.json();
+//       // (err) => alert(err) // handling errors
+//     }) // reads the ReadableStream object in the body property of the fetch data
+//     .then((data) => {
+//       renderCountry(data[0]);
+//       // const neighbour = data[0].borders?.[0];
+//       const neighbour = 'dasfsdadf';
+//       // console.log(data);
+
+//       if (!neighbour) return;
+
+//       // return 23;
+//       // Country 2
+//       return fetch(
+//         `https://countries-api-836d.onrender.com/countries/alpha/${neighbour}`
+//       );
+//     })
+//     .then((response) => {
+//       if (!response.ok)
+//         throw new Error(`Country not found: ${response.status}`);
+
+//       return response.json();
+//     })
+//     .then((data) => renderCountry(data, 'neighbour'))
+//     .catch((err) => {
+//       // catch method is called when a promise is rejected
+//       console.error(err); // better way of handling errors in all of the chains
+//       renderErr(`Something went wrong: ${err.message}. Try again!`);
+//     })
+//     .finally(() => {
+//       countriesContainer.style.opacity = 1;
+//     }); // finally method is a method that happens no matter what in promises, regardless whether a promise is fulfilled or rejected
+// };
+
+// getCountryData('dasdfasdf');
+
+// Lesson 7 - Handling Rejected Promises - code changes above, see notes for reference - catch, finally methods
+
+// Lesson 8 - Throwing Errors Manually
