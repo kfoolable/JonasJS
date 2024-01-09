@@ -35,7 +35,7 @@ const countriesContainer = document.querySelector('.countries');
 
 const renderErr = function (msg) {
   countriesContainer.insertAdjacentText('beforeend', msg);
-  // countriesContainer.style.opacity = 1;
+  countriesContainer.style.opacity = 1;
 };
 
 ///////////////////////////////////////
@@ -95,7 +95,7 @@ const renderCountry = function (data, className = '') {
       </article>
   `;
   countriesContainer.insertAdjacentHTML('beforeend', html);
-  // countriesContainer.style.opacity = 1;
+  countriesContainer.style.opacity = 1;
 };
 
 const getCountryAndNeighbour = function (country) {
@@ -188,49 +188,7 @@ const getCountryAndNeighbour = function (country) {
 
 // Lecture 6 - Chaining Promises
 
-const getJSON = function (url, errorMsg = 'Somethingg went wrong') {
-  return fetch(url).then((response) => {
-    if (!response.ok) throw new Error(`${errorMsg}: ${response.status}`);
-
-    return response.json();
-  });
-};
-
-const getCountryData = function (country) {
-  // Country 1
-  getJSON(
-    `https://countries-api-836d.onrender.com/countries/name/${country}`,
-    'Country not found'
-  )
-    .then((data) => {
-      renderCountry(data[0]);
-      const neighbour = data[0].borders?.[0];
-      // const neighbour = 'dasfsdadf';
-      // console.log(data);
-
-      if (!neighbour) throw new Error(`No neighbour found!`);
-
-      // Country 2
-      return getJSON(
-        `https://countries-api-836d.onrender.com/countries/alpha/${neighbour}`,
-        'Country not found'
-      );
-    })
-    .then((data) => renderCountry(data, 'neighbour'))
-    .catch((err) => {
-      console.error(err);
-      renderErr(`Something went wrong: ${err.message}. Try again!`);
-    })
-    .finally(() => {
-      countriesContainer.style.opacity = 1;
-    });
-};
-
-btn.addEventListener('click', function () {
-  // getCountryData('portugal');
-  getCountryData('australia');
-});
-
+// Previous version, newer version is up
 // const getCountryData = function (country) {
 //   // Country 1
 //   fetch(`https://countries-api-836d.onrender.com/countries/name/${country}`)
@@ -276,6 +234,51 @@ btn.addEventListener('click', function () {
 
 // getCountryData('dasdfasdf');
 
+const getJSON = function (url, errorMsg = 'Something went wrong') {
+  return fetch(url).then((response) => {
+    if (!response.ok) throw new Error(`${errorMsg}: ${response.status}`);
+
+    return response.json();
+  });
+};
+
+const getCountryData = function (country) {
+  // Country 1
+  getJSON(
+    `https://countries-api-836d.onrender.com/countries/name/${country}`,
+    'Country not found'
+  )
+    .then((data) => {
+      renderCountry(data[0]);
+      const neighbour = data[0].borders?.[0];
+      // const neighbour = 'dasfsdadf';
+      // console.log(data);
+
+      if (!neighbour) throw new Error(`No neighbour found!`);
+
+      // Country 2
+      return getJSON(
+        `https://countries-api-836d.onrender.com/countries/alpha/${neighbour}`,
+        'Country not found'
+      );
+    })
+    .then((data) => renderCountry(data, 'neighbour'))
+    .catch((err) => {
+      console.error(err);
+      renderErr(`Something went wrong: ${err.message}. Try again!`);
+    })
+    .finally(() => {
+      countriesContainer.style.opacity = 1;
+    });
+};
+
+btn.addEventListener('click', function () {
+  // getCountryData('portugal');
+  getCountryData('australia');
+});
+
 // Lesson 7 - Handling Rejected Promises - code changes above, see notes for reference - catch, finally methods
 
-// Lesson 8 - Throwing Errors Manually
+// Lesson 8 - Throwing Errors Manually aka Custom Error messages - code changes above
+
+// Lesson 9 - Asynchronous Behind the Scenes: The Event Loop - lecture part, best to watch video
